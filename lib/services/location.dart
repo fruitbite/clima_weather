@@ -22,7 +22,5 @@ class LocationService {
         desiredAccuracy: LocationAccuracy.low);
     latitude = position.latitude;
     longitude = position.longitude;
-    print(latitude);
-    print(longitude);
   }
 }

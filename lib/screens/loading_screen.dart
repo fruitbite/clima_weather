@@ -13,19 +13,21 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     _locationService.getCurrentLocation();
+    print(_locationService.latitude);
+    print(_locationService.longitude);
     super.initState();
   }
 
-  void getData() async {
-    
-  }
+  void getData() async {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            _locationService.getCurrentLocation();
+          },
           child: const Text('Get Location'),
         ),
       ),
