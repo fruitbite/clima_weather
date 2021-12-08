@@ -4,11 +4,14 @@ class LocationService {
   double? latitude;
   double? longitude;
 
-  void getCurrentLocation() async {
+  Future<void> getCurrentLocation() async {
     LocationPermission permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.whileInUse ||
         permission == LocationPermission.always) {
-      _getLocation();
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low);
+      latitude = position.latitude;
+      longitude = position.longitude;
     } else if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
       print('permission denied');
