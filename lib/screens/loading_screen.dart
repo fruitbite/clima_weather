@@ -47,8 +47,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
-  void unpack() {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
