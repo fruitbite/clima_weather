@@ -1,7 +1,8 @@
+import 'package:clima_weather/screens/location_screen.dart';
 import 'package:clima_weather/services/location.dart';
+import 'package:clima_weather/services/networking.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../key.dart';
 
@@ -15,49 +16,36 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   double? latitude;
   double? longitude;
-  http.Response? response;
-  void getLocation() async {
+  void getLocationData() async {
     await _locationService.getCurrentLocation();
     latitude = _locationService.latitude ?? 0.0;
     longitude = _locationService.longitude ?? 0.0;
-    print(longitude);
-    print(latitude);
+    NetworkHelper networkHelper = NetworkHelper(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey');
+    final weatherData = await networkHelper.getData();
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LocationScreen(weatherData: weatherData)));
+    // int id = weatherData['weather'][0]['id'];
+    // double temperature = weatherData['main']['temp'];
+    // String city = weatherData['name'];
   }
 
   final LocationService _locationService = LocationService();
   @override
   void initState() {
-    getLocation();
+    getLocationData();
     super.initState();
-  }
-
-  void getData() async {
-    Uri uri = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey');
-    response = await http.get(uri);
-    if (response!.statusCode == 200) {
-      String data = response!.body;
-      final decodedData = jsonDecode(data);
-      int id = decodedData['weather'][0]['id'];
-      double temperature = decodedData['main']['temp'];
-      String city = decodedData['name'];
-      print("$city, $temperature, $id");
-    } else {
-      print('Error: Couldn\'t get data for this location');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            getData();
-          },
-          child: const Text('Get Location'),
-        ),
-      ),
+          child: SpinKitFadingCircle(
+        color: Colors.blue,
+      )),
     );
   }
 }
