@@ -9,9 +9,11 @@ class CityScreen extends StatefulWidget {
 }
 
 class _CityScreenState extends State<CityScreen> {
+  final TextEditingController cityNameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -26,19 +28,36 @@ class _CityScreenState extends State<CityScreen> {
               Align(
                 alignment: Alignment.topLeft,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: const Icon(
                     Icons.arrow_back_ios,
                     size: 50.0,
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                child: null,
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  style: const TextStyle(color: Colors.black),
+                  decoration: kTextFieldDecoration,
+                  controller: cityNameController,
+                ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    cityNameController.text,
+                  );
+                },
                 child: const Text(
                   'Get Weather',
                   style: kButtonTextStyle,

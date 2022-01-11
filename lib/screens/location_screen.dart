@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:clima_weather/screens/city_screen.dart';
+import 'package:clima_weather/services/weather_service.dart';
 import 'package:clima_weather/utilities/constants.dart';
+import 'package:flutter/material.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({Key? key, this.weatherData}) : super(key: key);
@@ -9,6 +11,55 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  final WeatherModel weatherModel = WeatherModel();
+
+  int? temperature;
+  String? weatherMessege;
+  String? weatherIcon;
+  String? cityName;
+  @override
+  void initState() {
+    super.initState();
+    updateUI(widget.weatherData);
+  }
+
+  void updateWeather() async {
+    final weatherData = await weatherModel.getLocationWeather();
+    setState(() {
+      updateUI(weatherData);
+    });
+  }
+
+  void updateCityWeather(String cityName) async {
+    final weatherData = await weatherModel.getCityWeather(cityName);
+    setState(() {
+      updateUI(weatherData);
+    });
+  }
+
+  void updateUI(dynamic weatherData) {
+    if (weatherData == null) {
+      setState(() {
+        temperature = 0;
+        weatherIcon = 'Error';
+        weatherMessege = 'Unable to get weather data';
+        cityName = '';
+        return;
+      });
+    } else if (weatherData != null) {
+      int condition = weatherData['weather'][0]['id'];
+      weatherIcon = weatherModel.getWeatherIcon(condition);
+      double temp = weatherData['main']['temp'];
+      temperature = temp.toInt();
+      cityName = weatherData['name'];
+      weatherMessege =
+          ('${weatherModel.getMessage(temperature!)} in $cityName');
+      print('$condition, $temperature, $cityName');
+    } else {
+      //location services disabled
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,14 +82,22 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => updateWeather(),
                     child: const Icon(
                       Icons.near_me,
                       size: 50.0,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final dynamic typedName = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CityScreen()));
+                      if (typedName != null || typedName == '') {
+                        updateCityWeather(typedName);
+                      } else {}
+                    },
                     child: const Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -49,22 +108,22 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 15.0),
                 child: Row(
-                  children: const <Widget>[
+                  children: <Widget>[
                     Text(
-                      '32°',
+                      '$temperature°',
                       style: kTempTextStyle,
                     ),
                     Text(
-                      '☀️',
+                      weatherIcon!,
                       style: kConditionTextStyle,
                     ),
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(right: 15.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "It's 🍦 time in San Francisco!",
+                  weatherMessege!,
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),

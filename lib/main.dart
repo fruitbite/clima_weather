@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.dark(),
       home: const LoadingScreen(),
+      title: 'Clima Weather App',
     );
   }
 }
